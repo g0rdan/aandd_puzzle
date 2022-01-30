@@ -1,4 +1,4 @@
-import 'package:aandd_puzzle/game/puzzle_game.dart';
+import 'package:aandd_puzzle/game/main_game.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -49,9 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) {
-                      return const PuzzleGame();
-                    },
+                    builder: (_) => const MainGame(),
                   ),
                 );
               },
