@@ -3,22 +3,22 @@ import 'package:flame/components.dart';
 
 class GameTileLite extends SpriteComponent with Tappable {
   final Sprite _sprite;
-  BoardCoordinate? coordinate;
   final Function(BoardCoordinate) onTap;
+  final BoardCoordinate _rigthCoordinate;
+  BoardCoordinate? currentCoordinate;
+
+  bool get isInTheRigthPlace => _rigthCoordinate == currentCoordinate;
 
   GameTileLite({
     required Sprite sprite,
-    required int positionX,
-    required int positionY,
+    required BoardCoordinate coordinate,
     required this.onTap,
     Vector2? position,
     Vector2? size,
     Anchor? anchor,
   })  : _sprite = sprite,
-        coordinate = BoardCoordinate(
-          x: positionX,
-          y: positionY,
-        ),
+        _rigthCoordinate = coordinate,
+        currentCoordinate = coordinate,
         super(
           sprite: sprite,
           position: position,
@@ -28,7 +28,7 @@ class GameTileLite extends SpriteComponent with Tappable {
 
   @override
   bool onTapDown(info) {
-    onTap(coordinate!);
+    onTap(currentCoordinate!);
     return true;
   }
 
@@ -37,6 +37,6 @@ class GameTileLite extends SpriteComponent with Tappable {
       size.x * point.x,
       size.y * point.y,
     );
-    coordinate = point;
+    currentCoordinate = point;
   }
 }

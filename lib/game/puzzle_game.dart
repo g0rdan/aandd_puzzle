@@ -3,6 +3,7 @@ import 'package:aandd_puzzle/game/game_config.dart';
 import 'package:aandd_puzzle/game/game_tile.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+import 'package:flame/palette.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,7 @@ class PuzzleGame extends FlameGame
   final GameConfig gameConfig;
   final tiles = <GameTileLite>[];
   late BoardCoordinate _emptySlot;
+  late TextComponent textComponent;
 
   PuzzleGame({
     required this.gameConfig,
@@ -18,6 +20,11 @@ class PuzzleGame extends FlameGame
 
   static final fpsTextPaint = TextPaint(
     style: const TextStyle(color: Color(0xFFFFFFFF)),
+  );
+
+  final _regularTextStyle = TextStyle(
+    fontSize: 18,
+    color: BasicPalette.white.color,
   );
 
   @override
@@ -36,14 +43,24 @@ class PuzzleGame extends FlameGame
   Future<void> onLoad() async {
     super.onLoad();
     add(ScreenCollidable());
+    await _initiate(
+      const GameConfig(
+        width: 2,
+        height: 2,
+      ),
+    );
+    // TODO: fix
+    // _shuffle();
+    final win = _checkWin();
+    textComponent.text = 'win: $win';
+  }
 
-    const columns = 2;
-    const rows = 2;
+  Future<void> _initiate(GameConfig config) async {
     final spriteImage = await images.load('dash_squared_small.png');
     final spritesheet = SpriteSheet.fromColumnsAndRows(
       image: spriteImage,
-      columns: columns,
-      rows: rows,
+      columns: config.width,
+      rows: config.height,
     );
 
     for (var i = 0; i < spritesheet.columns; i++) {
@@ -51,15 +68,9 @@ class PuzzleGame extends FlameGame
         final sprite = spritesheet.getSprite(y, i);
         if (i != spritesheet.columns - 1 || y != spritesheet.rows - 1) {
           final tile = GameTileLite(
-            onTap: (tap) {
-              final result = _closeToEmptySlot(tap);
-              if (result) {
-                _moveTile(tap, _emptySlot);
-              }
-            },
+            onTap: _onTap,
             sprite: sprite,
-            positionX: i,
-            positionY: y,
+            coordinate: BoardCoordinate(x: i, y: y),
             position: Vector2(
               sprite.srcPosition.x,
               sprite.srcPosition.y,
@@ -74,6 +85,17 @@ class PuzzleGame extends FlameGame
         }
       }
     }
+
+    textComponent = TextComponent(
+      text: '',
+      textRenderer: TextPaint(style: _regularTextStyle),
+      anchor: Anchor.topLeft,
+      position: Vector2(
+        0.0,
+        spriteImage.height + 10,
+      ),
+    );
+    add(textComponent);
   }
 
   bool _closeToEmptySlot(BoardCoordinate coordinate) {
@@ -87,8 +109,38 @@ class PuzzleGame extends FlameGame
 
   void _moveTile(BoardCoordinate coordinate, BoardCoordinate emptySlot) {
     final copyCoordinates = coordinate.copy();
-    final rigthTile = tiles.firstWhere((tile) => tile.coordinate == coordinate);
+    final rigthTile =
+        tiles.firstWhere((tile) => tile.currentCoordinate == coordinate);
     rigthTile.move(emptySlot);
     _emptySlot = copyCoordinates;
+  }
+
+  void _shuffle() {
+    final shuffledCoordinates =
+        (tiles.map((e) => e.currentCoordinate).cast<BoardCoordinate>().toList()
+          ..shuffle());
+
+    final copyIfTiles = [...tiles];
+    for (final coordinate in shuffledCoordinates) {
+      final tile = copyIfTiles.removeLast();
+      tile.move(coordinate);
+    }
+  }
+
+  void _onTap(BoardCoordinate coordinate) {
+    if (_closeToEmptySlot(coordinate)) {
+      _moveTile(coordinate, _emptySlot);
+      final win = _checkWin();
+      textComponent.text = 'win: $win';
+    }
+  }
+
+  bool _checkWin() {
+    for (var tile in tiles) {
+      if (!tile.isInTheRigthPlace) {
+        return false;
+      }
+    }
+    return true;
   }
 }
