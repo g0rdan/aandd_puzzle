@@ -5,13 +5,30 @@ import 'package:aandd_puzzle/game/game_tile.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/sprite.dart';
+import 'package:flutter/material.dart';
 
-class PuzzleGame extends FlameGame with HasCollidables {
+class PuzzleGame extends FlameGame with HasCollidables, FPSCounter {
   final GameConfig gameConfig;
 
   PuzzleGame({
     required this.gameConfig,
   });
+
+  static final fpsTextPaint = TextPaint(
+    style: const TextStyle(color: Color(0xFFFFFFFF)),
+  );
+
+  @override
+  bool debugMode = true;
+
+  @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+
+    if (debugMode) {
+      fpsTextPaint.render(canvas, fps(120).toString(), Vector2(0, 50));
+    }
+  }
 
   @override
   Future<void> onLoad() async {
