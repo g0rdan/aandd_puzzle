@@ -45,8 +45,8 @@ class PuzzleGame extends FlameGame
     add(ScreenCollidable());
     await _initiate(
       const GameConfig(
-        width: 2,
-        height: 2,
+        width: 4,
+        height: 4,
       ),
     );
     // TODO: fix
