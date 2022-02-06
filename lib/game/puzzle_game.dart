@@ -1,5 +1,4 @@
-import 'dart:math';
-
+import 'package:aandd_puzzle/game/board_coordinate.dart';
 import 'package:aandd_puzzle/game/game_config.dart';
 import 'package:aandd_puzzle/game/game_tile.dart';
 import 'package:flame/components.dart';
@@ -7,8 +6,11 @@ import 'package:flame/game.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
 
-class PuzzleGame extends FlameGame with HasCollidables, FPSCounter {
+class PuzzleGame extends FlameGame
+    with HasCollidables, HasTappables, FPSCounter {
   final GameConfig gameConfig;
+  final tiles = <GameTileLite>[];
+  late BoardCoordinate _emptySlot;
 
   PuzzleGame({
     required this.gameConfig,
@@ -37,7 +39,6 @@ class PuzzleGame extends FlameGame with HasCollidables, FPSCounter {
 
     const columns = 2;
     const rows = 2;
-    const frames = columns * rows;
     final spriteImage = await images.load('dash_squared_small.png');
     final spritesheet = SpriteSheet.fromColumnsAndRows(
       image: spriteImage,
@@ -45,44 +46,49 @@ class PuzzleGame extends FlameGame with HasCollidables, FPSCounter {
       rows: rows,
     );
 
-    // final sprites = List<Sprite>.generate(frames, spritesheet.getSpriteById);
-
     for (var i = 0; i < spritesheet.columns; i++) {
       for (var y = 0; y < spritesheet.rows; y++) {
         final sprite = spritesheet.getSprite(y, i);
-        add(
-          SpriteComponent(
+        if (i != spritesheet.columns - 1 || y != spritesheet.rows - 1) {
+          final tile = GameTileLite(
+            onTap: (tap) {
+              final result = _closeToEmptySlot(tap);
+              if (result) {
+                _moveTile(tap, _emptySlot);
+              }
+            },
             sprite: sprite,
+            positionX: i,
+            positionY: y,
             position: Vector2(
               sprite.srcPosition.x,
               sprite.srcPosition.y,
-            ), //position,
+            ),
             size: sprite.srcSize,
             anchor: Anchor.topLeft,
-          ),
-        );
+          );
+          add(tile);
+          tiles.add(tile);
+        } else {
+          _emptySlot = BoardCoordinate(x: i, y: y);
+        }
       }
     }
+  }
 
-    final spriteAmount = gameConfig.width * gameConfig.height;
-    // for (var i = 0; i < spriteAmount; i++) {
-    //   final sprite = GameTile(
-    //     i,
-    //     Vector2(
-    //       (Random().nextBool() ? -1 : 1) * Random().nextInt(100).toDouble(),
-    //       (Random().nextBool() ? -1 : 1) * Random().nextInt(100).toDouble(),
-    //     ),
-    //     Vector2(
-    //       Random().nextInt(size.x.toInt() - 100).toDouble(),
-    //       Random().nextInt(size.y.toInt() - 100).toDouble(),
-    //     ),
-    //     angle: pi / Random().nextInt(4),
-    //   );
+  bool _closeToEmptySlot(BoardCoordinate coordinate) {
+    for (final neighbor in coordinate.getNeighbors()) {
+      if (neighbor == _emptySlot) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-    //   if (Random().nextBool()) {
-    //     sprite.flipVertically();
-    //   }
-    //   add(sprite);
-    // }
+  void _moveTile(BoardCoordinate coordinate, BoardCoordinate emptySlot) {
+    final copyCoordinates = coordinate.copy();
+    final rigthTile = tiles.firstWhere((tile) => tile.coordinate == coordinate);
+    rigthTile.move(emptySlot);
+    _emptySlot = copyCoordinates;
   }
 }
