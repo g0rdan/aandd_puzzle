@@ -1,5 +1,6 @@
 import 'package:aandd_puzzle/game/board_coordinate.dart';
 import 'package:aandd_puzzle/game/game_config.dart';
+import 'package:aandd_puzzle/game/game_state.dart';
 import 'package:aandd_puzzle/game/game_tile.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
@@ -13,6 +14,7 @@ class PuzzleGame extends FlameGame
   final tiles = <GameTileLite>[];
   late BoardCoordinate _emptySlot;
   late TextComponent textComponent;
+  final gameState = GameState();
 
   PuzzleGame({
     required this.gameConfig,
@@ -107,12 +109,22 @@ class PuzzleGame extends FlameGame
     return false;
   }
 
-  void _moveTile(BoardCoordinate coordinate, BoardCoordinate emptySlot) {
-    final copyCoordinates = coordinate.copy();
-    final rigthTile =
-        tiles.firstWhere((tile) => tile.currentCoordinate == coordinate);
-    rigthTile.move(emptySlot);
-    _emptySlot = copyCoordinates;
+  void _moveTile({
+    required BoardCoordinate from,
+    required BoardCoordinate to,
+  }) {
+    final tileToMove =
+        tiles.firstWhere((tile) => tile.currentCoordinate == from);
+    tileToMove.move(to);
+    _emptySlot = from;
+  }
+
+  void _revert() {
+    final lastMove = gameState.revert();
+    _moveTile(
+      from: lastMove.after,
+      to: lastMove.before,
+    );
   }
 
   void _shuffle() {
@@ -129,14 +141,23 @@ class PuzzleGame extends FlameGame
 
   void _onTap(BoardCoordinate coordinate) {
     if (_closeToEmptySlot(coordinate)) {
-      _moveTile(coordinate, _emptySlot);
+      final gameMove = GameMove(
+        before: coordinate,
+        after: _emptySlot,
+      );
+      // keep game state before moving tile
+      gameState.keep(gameMove);
+      _moveTile(
+        from: coordinate,
+        to: _emptySlot,
+      );
       final win = _checkWin();
       textComponent.text = 'win: $win';
     }
   }
 
   bool _checkWin() {
-    for (var tile in tiles) {
+    for (final tile in tiles) {
       if (!tile.isInTheRigthPlace) {
         return false;
       }
