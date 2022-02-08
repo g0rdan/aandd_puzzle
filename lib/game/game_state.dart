@@ -2,6 +2,9 @@ import 'package:aandd_puzzle/game/board_coordinate.dart';
 import 'package:aandd_puzzle/utils/stack.dart';
 import 'package:equatable/equatable.dart';
 
+/// State of the game.
+///
+/// Keeps all moves of a user in "history" and count every move.
 class GameState {
   int _totalSteps = 0;
   Stack<GameMove> state = Stack();
@@ -24,6 +27,10 @@ class GameState {
   }
 }
 
+/// Represents tile movement
+///
+/// [before] shows tile coordinate before moving to the empty slot
+/// [after] shows coordinate of where tile goes
 class GameMove extends Equatable {
   final BoardCoordinate before;
   final BoardCoordinate after;
