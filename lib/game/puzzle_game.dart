@@ -146,12 +146,13 @@ class PuzzleGame extends FlameGame
 
   void _onTap(BoardCoordinate coordinate) {
     if (_closeToEmptySlot(coordinate)) {
-      final gameMove = GameMove(
-        before: coordinate,
-        after: _emptySlot,
-      );
       // keep game state before moving tile
-      gameState.keep(gameMove);
+      gameState.keep(
+        GameMove(
+          before: coordinate,
+          after: _emptySlot,
+        ),
+      );
       _moveTile(
         from: coordinate,
         to: _emptySlot,

@@ -1,5 +1,7 @@
 import 'package:aandd_puzzle/game/board_coordinate.dart';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
+import 'package:flutter/widgets.dart';
 
 class GameTileLite extends SpriteComponent with Tappable {
   final Sprite _sprite;
@@ -33,9 +35,17 @@ class GameTileLite extends SpriteComponent with Tappable {
   }
 
   void move(BoardCoordinate point) {
-    position = Vector2(
-      size.x * point.x,
-      size.y * point.y,
+    add(
+      MoveEffect.to(
+        Vector2(
+          size.x * point.x,
+          size.y * point.y,
+        ),
+        EffectController(
+          duration: 0.3,
+          curve: Curves.easeInOut,
+        ),
+      ),
     );
     currentCoordinate = point;
   }
