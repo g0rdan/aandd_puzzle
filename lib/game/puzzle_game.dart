@@ -117,6 +117,9 @@ class PuzzleGame extends FlameGame
         tiles.firstWhere((tile) => tile.currentCoordinate == from);
     tileToMove.move(to);
     _emptySlot = from;
+    // check if it is winner position
+    final win = _checkWin();
+    textComponent.text = 'win: $win';
   }
 
   void undo() {
@@ -153,8 +156,6 @@ class PuzzleGame extends FlameGame
         from: coordinate,
         to: _emptySlot,
       );
-      final win = _checkWin();
-      textComponent.text = 'win: $win';
     }
   }
 
