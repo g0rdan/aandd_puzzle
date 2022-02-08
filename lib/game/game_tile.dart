@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/widgets.dart';
 
-class GameTileLite extends SpriteComponent with Tappable {
+class GameTileLite extends SpriteComponent with Tappable, Hoverable {
   final Sprite _sprite;
   final Function(BoardCoordinate) onTap;
   final BoardCoordinate _rigthCoordinate;
@@ -29,6 +29,20 @@ class GameTileLite extends SpriteComponent with Tappable {
         );
 
   @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+    add(
+      ScaleEffect.to(
+        Vector2.all(isHovered ? 0.9 : 1.0),
+        EffectController(
+          duration: 0.1,
+          curve: Curves.linear,
+        ),
+      ),
+    );
+  }
+
+  @override
   bool onTapDown(info) {
     onTap(currentCoordinate!);
     return true;
@@ -38,8 +52,8 @@ class GameTileLite extends SpriteComponent with Tappable {
     add(
       MoveEffect.to(
         Vector2(
-          size.x * point.x,
-          size.y * point.y,
+          size.x * point.x + size.x / 2,
+          size.y * point.y + size.y / 2,
         ),
         EffectController(
           duration: 0.3,

@@ -9,7 +9,7 @@ import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
 
 class PuzzleGame extends FlameGame
-    with HasCollidables, HasTappables, FPSCounter {
+    with HasHoverables, HasTappables, FPSCounter {
   final GameConfig gameConfig;
   final tiles = <GameTileLite>[];
   late BoardCoordinate _emptySlot;
@@ -37,7 +37,7 @@ class PuzzleGame extends FlameGame
     super.render(canvas);
 
     if (debugMode) {
-      fpsTextPaint.render(canvas, fps(120).toString(), Vector2(0, 50));
+      fpsTextPaint.render(canvas, 'FPS: ${fps(120)}', Vector2(0, 450));
     }
   }
 
@@ -74,11 +74,11 @@ class PuzzleGame extends FlameGame
             sprite: sprite,
             coordinate: BoardCoordinate(x: i, y: y),
             position: Vector2(
-              sprite.srcPosition.x,
-              sprite.srcPosition.y,
+              sprite.srcPosition.x + sprite.srcSize.x / 2,
+              sprite.srcPosition.y + sprite.srcSize.y / 2,
             ),
             size: sprite.srcSize,
-            anchor: Anchor.topLeft,
+            anchor: Anchor.center,
           );
           add(tile);
           tiles.add(tile);
