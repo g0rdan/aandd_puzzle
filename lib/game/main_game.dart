@@ -11,19 +11,31 @@ class MainGame extends StatefulWidget {
 }
 
 class _MainGameState extends State<MainGame> {
+  late PuzzleGame puzzleGame;
+
+  @override
+  void initState() {
+    super.initState();
+    puzzleGame = PuzzleGame(
+      gameConfig: const GameConfig(
+        width: 4,
+        height: 4,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       body: Center(
         child: GameWidget(
-          game: PuzzleGame(
-            gameConfig: const GameConfig(
-              width: 4,
-              height: 4,
-            ),
-          ),
+          game: puzzleGame,
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.undo_rounded),
+        onPressed: puzzleGame.undo,
       ),
     );
   }

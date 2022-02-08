@@ -119,12 +119,14 @@ class PuzzleGame extends FlameGame
     _emptySlot = from;
   }
 
-  void _revert() {
+  void undo() {
     final lastMove = gameState.revert();
-    _moveTile(
-      from: lastMove.after,
-      to: lastMove.before,
-    );
+    if (lastMove != null) {
+      _moveTile(
+        from: lastMove.after,
+        to: lastMove.before,
+      );
+    }
   }
 
   void _shuffle() {

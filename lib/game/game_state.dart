@@ -14,9 +14,8 @@ class GameState {
     state.push(move);
   }
 
-  GameMove revert() {
-    _totalSteps++;
-    return state.pop();
+  GameMove? revert() {
+    return state.length > 0 ? state.pop() : null;
   }
 
   void clear() {
