@@ -8,6 +8,7 @@ import 'package:equatable/equatable.dart';
 class GameState {
   int _totalSteps = 0;
   Stack<GameMove> state = Stack();
+  bool win = false;
 
   int get totalSteps => _totalSteps;
   int get step => state.length;

@@ -9,7 +9,7 @@ import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
 
 class PuzzleGame extends FlameGame
-    with HasHoverables, HasTappables, FPSCounter {
+    with HasHoverables, HasCollidables, HasTappables, FPSCounter {
   final GameConfig gameConfig;
   final tiles = <GameTileLite>[];
   late BoardCoordinate _emptySlot;
@@ -53,8 +53,7 @@ class PuzzleGame extends FlameGame
     );
     // TODO: fix
     // _shuffle();
-    final win = _checkWin();
-    textComponent.text = 'win: $win';
+    _checkWin();
   }
 
   Future<void> _initiate(GameConfig config) async {
@@ -70,6 +69,7 @@ class PuzzleGame extends FlameGame
         final sprite = spritesheet.getSprite(y, i);
         if (i != spritesheet.columns - 1 || y != spritesheet.rows - 1) {
           final tile = GameTileLite(
+            gameState: gameState,
             onTap: _onTap,
             sprite: sprite,
             coordinate: BoardCoordinate(x: i, y: y),
@@ -118,8 +118,7 @@ class PuzzleGame extends FlameGame
     tileToMove.move(to);
     _emptySlot = from;
     // check if it is winner position
-    final win = _checkWin();
-    textComponent.text = 'win: $win';
+    _checkWin();
   }
 
   void undo() {
@@ -160,12 +159,20 @@ class PuzzleGame extends FlameGame
     }
   }
 
-  bool _checkWin() {
+  void _checkWin() {
+    bool win = true;
     for (final tile in tiles) {
       if (!tile.isInTheRigthPlace) {
-        return false;
+        win = false;
+        break;
       }
     }
-    return true;
+
+    gameState.win = win;
+    textComponent.text = 'win: $win';
+
+    tiles.forEach((tile) {
+      tile.scaleTo(win ? 1.0 : 0.9);
+    });
   }
 }

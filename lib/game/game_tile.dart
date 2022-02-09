@@ -1,19 +1,26 @@
+import 'dart:io';
+
 import 'package:aandd_puzzle/game/board_coordinate.dart';
+import 'package:aandd_puzzle/game/game_state.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 class GameTileLite extends SpriteComponent with Tappable, Hoverable {
   final Sprite _sprite;
+  final GameState gameState;
   final Function(BoardCoordinate) onTap;
   final BoardCoordinate _rigthCoordinate;
   BoardCoordinate? currentCoordinate;
+  bool? _hovered;
 
   bool get isInTheRigthPlace => _rigthCoordinate == currentCoordinate;
 
   GameTileLite({
     required Sprite sprite,
     required BoardCoordinate coordinate,
+    required this.gameState,
     required this.onTap,
     Vector2? position,
     Vector2? size,
@@ -31,15 +38,18 @@ class GameTileLite extends SpriteComponent with Tappable, Hoverable {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    add(
-      ScaleEffect.to(
-        Vector2.all(isHovered ? 0.9 : 1.0),
-        EffectController(
-          duration: 0.1,
-          curve: Curves.linear,
-        ),
-      ),
-    );
+    // we want to "assemble" picture once player solves the puzzle
+    if (gameState.win) {
+      return;
+    }
+    // enable for platforms with "cursor" (presumably) only
+    if (kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      // remove "bouncing" scale
+      if (_hovered != isHovered) {
+        _hovered = isHovered;
+        scaleTo(isHovered ? 1.0 : 0.9);
+      }
+    }
   }
 
   @override
@@ -62,5 +72,17 @@ class GameTileLite extends SpriteComponent with Tappable, Hoverable {
       ),
     );
     currentCoordinate = point;
+  }
+
+  void scaleTo(double ratio) {
+    add(
+      ScaleEffect.to(
+        Vector2.all(ratio),
+        EffectController(
+          duration: 0.1,
+          curve: Curves.linear,
+        ),
+      ),
+    );
   }
 }
