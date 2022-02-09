@@ -30,7 +30,7 @@ class PuzzleGame extends FlameGame
   );
 
   @override
-  bool debugMode = true;
+  bool debugMode = const String.fromEnvironment('debug_flame') == 'true';
 
   @override
   void render(Canvas canvas) {

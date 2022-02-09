@@ -7,7 +7,9 @@
         "name": "chrome",
         "args": [
           "-d",
-          "chrome"
+          "chrome",
+          "--dart-define",
+          "debug_flame=true"
       ]
       },
     ]
