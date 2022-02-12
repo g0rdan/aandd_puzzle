@@ -1,4 +1,4 @@
-import 'package:aandd_puzzle/game/main_game.dart';
+import 'package:aandd_puzzle/game/game_options.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -18,6 +18,9 @@ class MyApp extends StatelessWidget {
       home: const MyHomePage(
         title: 'Slide puzzle game demo',
       ),
+      routes: {
+        'gameOptions': (_) => const GameOptions(),
+      },
     );
   }
 }
@@ -46,12 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Colors.indigo[50],
               child: const Text('Play Game'),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const MainGame(),
-                  ),
-                );
+                Navigator.of(context).pushNamed('gameOptions');
               },
             ),
           ],

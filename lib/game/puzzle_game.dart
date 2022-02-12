@@ -3,6 +3,7 @@ import 'package:aandd_puzzle/game/game_config.dart';
 import 'package:aandd_puzzle/game/game_state.dart';
 import 'package:aandd_puzzle/game/game_tile.dart';
 import 'package:flame/components.dart';
+import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/sprite.dart';
@@ -46,10 +47,7 @@ class PuzzleGame extends FlameGame
     super.onLoad();
     add(ScreenCollidable());
     await _initiate(
-      const GameConfig(
-        width: 4,
-        height: 4,
-      ),
+      gameConfig,
     );
     // TODO: fix
     // _shuffle();
@@ -57,17 +55,17 @@ class PuzzleGame extends FlameGame
   }
 
   Future<void> _initiate(GameConfig config) async {
-    final spriteImage = await images.load('dash_squared_small.png');
-    final spritesheet = SpriteSheet.fromColumnsAndRows(
+    final spriteImage = await images.load(gameConfig.gameImage);
+    final spriteSheet = SpriteSheet.fromColumnsAndRows(
       image: spriteImage,
       columns: config.width,
       rows: config.height,
     );
 
-    for (var i = 0; i < spritesheet.columns; i++) {
-      for (var y = 0; y < spritesheet.rows; y++) {
-        final sprite = spritesheet.getSprite(y, i);
-        if (i != spritesheet.columns - 1 || y != spritesheet.rows - 1) {
+    for (var i = 0; i < spriteSheet.columns; i++) {
+      for (var y = 0; y < spriteSheet.rows; y++) {
+        final sprite = spriteSheet.getSprite(y, i);
+        if (i != spriteSheet.columns - 1 || y != spriteSheet.rows - 1) {
           final tile = GameTileLite(
             gameState: gameState,
             onTap: _onTap,
