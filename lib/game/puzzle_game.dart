@@ -51,7 +51,7 @@ class PuzzleGame extends FlameGame
     await _initiate(
       gameConfig,
     );
-    _shuffle(10);
+    _shuffle(30);
   }
 
   Future<void> _initiate(GameConfig config) async {
@@ -139,13 +139,17 @@ class PuzzleGame extends FlameGame
   }
 
   void _shuffle(int steps) {
+    BoardCoordinate? choosen;
     for (var i = 0; i < steps; i++) {
-      final neiborsOfEmpty = _emptySlot.getNeighbors(
-        boardWidth: gameConfig.width,
-        boardHeigth: gameConfig.height,
-      );
+      final neiborsOfEmpty = _emptySlot
+          .getNeighbors(
+            boardWidth: gameConfig.width,
+            boardHeigth: gameConfig.height,
+          )
+          .where((neibor) => neibor != choosen)
+          .toList();
 
-      final choosen = neiborsOfEmpty[Random().nextInt(neiborsOfEmpty.length)];
+      choosen = neiborsOfEmpty[Random().nextInt(neiborsOfEmpty.length)];
 
       _moveTile(
         from: choosen,
