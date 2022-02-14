@@ -15,13 +15,24 @@ class BoardCoordinate extends Equatable {
   @override
   bool get stringify => true;
 
-  List<BoardCoordinate> getNeighbors() {
+  List<BoardCoordinate> getNeighbors({
+    required int boardWidth,
+    required int boardHeigth,
+  }) {
     return [
       BoardCoordinate(x: x - 1, y: y),
       BoardCoordinate(x: x, y: y - 1),
       BoardCoordinate(x: x + 1, y: y),
       BoardCoordinate(x: x, y: y + 1),
-    ];
+    ]
+        .where(
+          (neibor) =>
+              neibor.x >= 0 &&
+              neibor.y >= 0 &&
+              neibor.x < boardWidth &&
+              neibor.y < boardHeigth,
+        )
+        .toList();
   }
 
   BoardCoordinate copy() {

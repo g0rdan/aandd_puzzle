@@ -74,6 +74,14 @@ class GameTileLite extends SpriteComponent with Tappable, Hoverable {
     currentCoordinate = point;
   }
 
+  void moveNoAnimation(BoardCoordinate point) {
+    position = Vector2(
+      size.x * point.x + size.x / 2,
+      size.y * point.y + size.y / 2,
+    );
+    currentCoordinate = point;
+  }
+
   void scaleTo(double ratio) {
     add(
       ScaleEffect.to(

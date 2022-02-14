@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:aandd_puzzle/game/board_coordinate.dart';
 import 'package:aandd_puzzle/game/game_config.dart';
 import 'package:aandd_puzzle/game/game_state.dart';
@@ -49,9 +51,7 @@ class PuzzleGame extends FlameGame
     await _initiate(
       gameConfig,
     );
-    // TODO: fix
-    // _shuffle();
-    _checkWin();
+    _shuffle(10);
   }
 
   Future<void> _initiate(GameConfig config) async {
@@ -99,7 +99,10 @@ class PuzzleGame extends FlameGame
   }
 
   bool _closeToEmptySlot(BoardCoordinate coordinate) {
-    for (final neighbor in coordinate.getNeighbors()) {
+    for (final neighbor in coordinate.getNeighbors(
+      boardWidth: gameConfig.width,
+      boardHeigth: gameConfig.height,
+    )) {
       if (neighbor == _emptySlot) {
         return true;
       }
@@ -110,13 +113,19 @@ class PuzzleGame extends FlameGame
   void _moveTile({
     required BoardCoordinate from,
     required BoardCoordinate to,
+    bool animation = true,
   }) {
     final tileToMove =
         tiles.firstWhere((tile) => tile.currentCoordinate == from);
-    tileToMove.move(to);
+    if (animation) {
+      tileToMove.move(to);
+    } else {
+      tileToMove.moveNoAnimation(to);
+    }
+
     _emptySlot = from;
     // check if it is winner position
-    _checkWin();
+    if (animation) _checkWin();
   }
 
   void undo() {
@@ -129,15 +138,20 @@ class PuzzleGame extends FlameGame
     }
   }
 
-  void _shuffle() {
-    final shuffledCoordinates =
-        (tiles.map((e) => e.currentCoordinate).cast<BoardCoordinate>().toList()
-          ..shuffle());
+  void _shuffle(int steps) {
+    for (var i = 0; i < steps; i++) {
+      final neiborsOfEmpty = _emptySlot.getNeighbors(
+        boardWidth: gameConfig.width,
+        boardHeigth: gameConfig.height,
+      );
 
-    final copyIfTiles = [...tiles];
-    for (final coordinate in shuffledCoordinates) {
-      final tile = copyIfTiles.removeLast();
-      tile.move(coordinate);
+      final choosen = neiborsOfEmpty[Random().nextInt(neiborsOfEmpty.length)];
+
+      _moveTile(
+        from: choosen,
+        to: _emptySlot,
+        animation: false,
+      );
     }
   }
 
