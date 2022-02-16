@@ -24,7 +24,7 @@ class PuzzleGame extends FlameGame
   });
 
   static final fpsTextPaint = TextPaint(
-    style: const TextStyle(color: Color(0xFFFFFFFF)),
+    style: const TextStyle(color: Color(0xFF000000)),
   );
 
   final _regularTextStyle = TextStyle(
@@ -34,6 +34,9 @@ class PuzzleGame extends FlameGame
 
   @override
   bool debugMode = const String.fromEnvironment('debug_flame') == 'true';
+
+  @override
+  Color backgroundColor() => const Color(0xFFFFFFFF);
 
   @override
   void render(Canvas canvas) {
@@ -56,6 +59,8 @@ class PuzzleGame extends FlameGame
 
   Future<void> _initiate(GameConfig config) async {
     final spriteImage = await images.load(gameConfig.gameImage);
+    final startX = (size.x - spriteImage.size.x) / 2;
+
     final spriteSheet = SpriteSheet.fromColumnsAndRows(
       image: spriteImage,
       columns: config.width,
@@ -66,17 +71,18 @@ class PuzzleGame extends FlameGame
       for (var y = 0; y < spriteSheet.rows; y++) {
         final sprite = spriteSheet.getSprite(y, i);
         if (i != spriteSheet.columns - 1 || y != spriteSheet.rows - 1) {
+          final xC = sprite.srcPosition.x + sprite.srcSize.x / 2 + startX;
+          final yC = sprite.srcPosition.y + sprite.srcSize.y / 2;
+
           final tile = GameTileLite(
             gameState: gameState,
             onTap: _onTap,
             sprite: sprite,
             coordinate: BoardCoordinate(x: i, y: y),
-            position: Vector2(
-              sprite.srcPosition.x + sprite.srcSize.x / 2,
-              sprite.srcPosition.y + sprite.srcSize.y / 2,
-            ),
+            position: Vector2(xC, yC),
             size: sprite.srcSize,
             anchor: Anchor.center,
+            startX: startX,
           );
           add(tile);
           tiles.add(tile);

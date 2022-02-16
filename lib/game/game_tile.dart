@@ -12,6 +12,7 @@ class GameTileLite extends SpriteComponent with Tappable, Hoverable {
   final GameState gameState;
   final Function(BoardCoordinate) onTap;
   final BoardCoordinate _rigthCoordinate;
+  final double startX;
   BoardCoordinate? currentCoordinate;
   bool? _hovered;
 
@@ -22,6 +23,7 @@ class GameTileLite extends SpriteComponent with Tappable, Hoverable {
     required BoardCoordinate coordinate,
     required this.gameState,
     required this.onTap,
+    required this.startX,
     Vector2? position,
     Vector2? size,
     Anchor? anchor,
@@ -62,7 +64,7 @@ class GameTileLite extends SpriteComponent with Tappable, Hoverable {
     add(
       MoveEffect.to(
         Vector2(
-          size.x * point.x + size.x / 2,
+          size.x * point.x + size.x / 2 + startX,
           size.y * point.y + size.y / 2,
         ),
         EffectController(
@@ -76,7 +78,7 @@ class GameTileLite extends SpriteComponent with Tappable, Hoverable {
 
   void moveNoAnimation(BoardCoordinate point) {
     position = Vector2(
-      size.x * point.x + size.x / 2,
+      size.x * point.x + size.x / 2 + startX,
       size.y * point.y + size.y / 2,
     );
     currentCoordinate = point;
