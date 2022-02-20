@@ -43,7 +43,11 @@ class PuzzleGame extends FlameGame
     super.render(canvas);
 
     if (debugMode) {
-      fpsTextPaint.render(canvas, 'FPS: ${fps(120)}', Vector2(0, 450));
+      fpsTextPaint.render(
+        canvas,
+        'FPS: ${fps(120)}',
+        Vector2(0, size.y - 24),
+      );
     }
   }
 
@@ -59,7 +63,9 @@ class PuzzleGame extends FlameGame
 
   Future<void> _initiate(GameConfig config) async {
     final spriteImage = await images.load(gameConfig.gameImage);
-    final startX = (size.x - spriteImage.size.x) / 2;
+    final scaleFactor =
+        spriteImage.width > size.x ? size.x / spriteImage.width : 1.0;
+    final startX = (size.x - spriteImage.size.x * scaleFactor) / 2;
 
     final spriteSheet = SpriteSheet.fromColumnsAndRows(
       image: spriteImage,
@@ -71,8 +77,13 @@ class PuzzleGame extends FlameGame
       for (var y = 0; y < spriteSheet.rows; y++) {
         final sprite = spriteSheet.getSprite(y, i);
         if (i != spriteSheet.columns - 1 || y != spriteSheet.rows - 1) {
-          final xC = sprite.srcPosition.x + sprite.srcSize.x / 2 + startX;
-          final yC = sprite.srcPosition.y + sprite.srcSize.y / 2;
+          final newSize = Vector2(
+            sprite.srcSize.x * scaleFactor,
+            sprite.srcSize.y * scaleFactor,
+          );
+
+          final xC = sprite.srcPosition.x + newSize.x / 2 + startX;
+          final yC = sprite.srcPosition.y + newSize.y / 2;
 
           final tile = GameTileLite(
             gameState: gameState,
@@ -80,7 +91,7 @@ class PuzzleGame extends FlameGame
             sprite: sprite,
             coordinate: BoardCoordinate(x: i, y: y),
             position: Vector2(xC, yC),
-            size: sprite.srcSize,
+            size: newSize,
             anchor: Anchor.center,
             startX: startX,
           );
@@ -157,11 +168,7 @@ class PuzzleGame extends FlameGame
 
       choosen = neiborsOfEmpty[Random().nextInt(neiborsOfEmpty.length)];
 
-      _moveTile(
-        from: choosen,
-        to: _emptySlot,
-        animation: false,
-      );
+      _moveTile(from: choosen, to: _emptySlot, animation: false);
     }
   }
 

@@ -4,13 +4,22 @@
       {
         "type": "dart",
         "request": "launch",
+        "name": "default",
+        "args": [
+            "--dart-define",
+            "debug_flame=true"
+        ]
+      },
+      {
+        "type": "dart",
+        "request": "launch",
         "name": "chrome",
         "args": [
-          "-d",
-          "chrome",
-          "--dart-define",
-          "debug_flame=true"
-      ]
+            "-d",
+            "chrome",
+            "--dart-define",
+            "debug_flame=true"
+        ]
       },
     ]
   }

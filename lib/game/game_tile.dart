@@ -44,13 +44,11 @@ class GameTileLite extends SpriteComponent with Tappable, Hoverable {
     if (gameState.win) {
       return;
     }
-    // enable for platforms with "cursor" (presumably) only
-    if (kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      // remove "bouncing" scale
-      if (_hovered != isHovered) {
-        _hovered = isHovered;
-        scaleTo(isHovered ? 1.0 : 0.9);
-      }
+
+    // remove "bouncing" scale
+    if (_hovered != isHovered) {
+      _hovered = isHovered;
+      scaleTo(isHovered ? 1.0 : 0.9);
     }
   }
 
