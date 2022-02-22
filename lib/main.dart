@@ -1,7 +1,12 @@
 import 'package:aandd_puzzle/game/game_options.dart';
+import 'package:aandd_puzzle/game/game_state.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 void main() {
+  final getIt = GetIt.instance;
+  getIt.registerLazySingleton<GameState>(() => GameState());
+
   runApp(const MyApp());
 }
 

@@ -1,27 +1,25 @@
-import 'dart:io';
-
 import 'package:aandd_puzzle/game/board_coordinate.dart';
 import 'package:aandd_puzzle/game/game_state.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get_it/get_it.dart';
 
 class GameTileLite extends SpriteComponent with Tappable, Hoverable {
   final Sprite _sprite;
-  final GameState gameState;
   final Function(BoardCoordinate) onTap;
   final BoardCoordinate _rigthCoordinate;
   final double startX;
   BoardCoordinate? currentCoordinate;
   bool? _hovered;
 
+  final _gameState = GetIt.instance.get<GameState>();
+
   bool get isInTheRigthPlace => _rigthCoordinate == currentCoordinate;
 
   GameTileLite({
     required Sprite sprite,
     required BoardCoordinate coordinate,
-    required this.gameState,
     required this.onTap,
     required this.startX,
     Vector2? position,
@@ -41,7 +39,7 @@ class GameTileLite extends SpriteComponent with Tappable, Hoverable {
   void render(Canvas canvas) {
     super.render(canvas);
     // we want to "assemble" picture once player solves the puzzle
-    if (gameState.win) {
+    if (_gameState.win) {
       return;
     }
 

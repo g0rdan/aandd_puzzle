@@ -10,6 +10,7 @@ import 'package:flame/game.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 class PuzzleGame extends FlameGame
     with HasHoverables, HasCollidables, HasTappables, FPSCounter {
@@ -17,7 +18,8 @@ class PuzzleGame extends FlameGame
   final tiles = <GameTileLite>[];
   late BoardCoordinate _emptySlot;
   late TextComponent textComponent;
-  final gameState = GameState();
+
+  final _gameState = GetIt.instance.get<GameState>();
 
   PuzzleGame({
     required this.gameConfig,
@@ -46,18 +48,16 @@ class PuzzleGame extends FlameGame
       fpsTextPaint.render(
         canvas,
         'FPS: ${fps(120)}',
-        Vector2(0, size.y - 24),
+        Vector2(10, size.y - 24),
       );
     }
   }
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     add(ScreenCollidable());
-    await _initiate(
-      gameConfig,
-    );
+    await _initiate(gameConfig);
     _shuffle(30);
   }
 
@@ -86,7 +86,6 @@ class PuzzleGame extends FlameGame
           final yC = sprite.srcPosition.y + newSize.y / 2;
 
           final tile = GameTileLite(
-            gameState: gameState,
             onTap: _onTap,
             sprite: sprite,
             coordinate: BoardCoordinate(x: i, y: y),
@@ -146,7 +145,7 @@ class PuzzleGame extends FlameGame
   }
 
   void undo() {
-    final lastMove = gameState.revert();
+    final lastMove = _gameState.revert();
     if (lastMove != null) {
       _moveTile(
         from: lastMove.after,
@@ -165,9 +164,7 @@ class PuzzleGame extends FlameGame
           )
           .where((neibor) => neibor != choosen)
           .toList();
-
       choosen = neiborsOfEmpty[Random().nextInt(neiborsOfEmpty.length)];
-
       _moveTile(from: choosen, to: _emptySlot, animation: false);
     }
   }
@@ -175,7 +172,7 @@ class PuzzleGame extends FlameGame
   void _onTap(BoardCoordinate coordinate) {
     if (_closeToEmptySlot(coordinate)) {
       // keep game state before moving tile
-      gameState.keep(
+      _gameState.keep(
         GameMove(
           before: coordinate,
           after: _emptySlot,
@@ -197,7 +194,7 @@ class PuzzleGame extends FlameGame
       }
     }
 
-    gameState.win = win;
+    _gameState.win = win;
     textComponent.text = 'win: $win';
 
     tiles.forEach((tile) {
